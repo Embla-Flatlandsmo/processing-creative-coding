@@ -1,0 +1,8 @@
+modularGrid/.vscode
+modularGrid/application.windows32
+modularGrid/application.windows64
+**/.vscode
+**/build/.vscode
+**/build/out
+**/out
+**/build/build-tmp
