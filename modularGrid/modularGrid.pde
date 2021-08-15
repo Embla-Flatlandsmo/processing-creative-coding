@@ -5,22 +5,86 @@ import processing.svg.*;
 
 boolean record = false;
 
-
-float tileSize = 20;
+int tileSize = 20;
 int xNumTiles = 30;
 int yNumTiles = 30;
 
 int width = (int)round(tileSize*xNumTiles);
 int height = (int)round(tileSize*yNumTiles);
 
-
+boolean templateExists = false;
+String templateName;
+PImage templateImage;
 ArrayList<PShape> modules;
 
+boolean tiles[][];
+boolean prev_tiles[][];
 
-boolean tiles[][] = new boolean[xNumTiles][yNumTiles];
+// Workspace settings
 boolean mirrored = false;
+boolean pixelView = false;
+
+void importImage() {
+    templateImage = loadImage(templateName);
+    if (templateImage == null) return ;
+    templateImage.loadPixels();
+    if (templateImage.width == -1 || templateImage.height == -1) return;
+
+    color threshold = #808080;
+    templateImage.filter(THRESHOLD);
+    
+    width = templateImage.width;
+    height = templateImage.height;
+    xNumTiles = width;
+    yNumTiles = height;
+    tiles = new boolean[width][height];
+    templateExists = true;
+}
+
+void setTemplateImage() {
+    if (!templateExists) return;
+    color black = color(0,0,0);
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (templateImage.pixels[y*width+x] == #000000) {
+                tiles[x][y] = true;
+            } else {
+                tiles[x][y] = false;
+            }
+        }
+    }
+}
 
 void settings() {
+    /*Load settings */
+    String[] settings = loadStrings("data/settings.txt");
+
+
+    for(String s:settings){
+        String[] setting=s.split("=");
+        switch(setting[0].trim().toLowerCase()) {
+            case "tilesize":
+                tileSize = Integer.valueOf(setting[1]);
+                break;
+            case "xnumtiles":
+                xNumTiles = Integer.valueOf(setting[1]);
+                break;
+            case "ynumtiles":
+                yNumTiles = Integer.valueOf(setting[1]);
+                break;
+            case "templatename":
+                templateName = setting[1];
+                importImage();
+            default:
+                println("No settings found");
+                break;
+        }
+    }
+    tiles = new boolean[xNumTiles][yNumTiles];
+    setTemplateImage();
+    int width = (int)round(tileSize*xNumTiles);
+    int height = (int)round(tileSize*yNumTiles);
     size(width, height);
 }
 
@@ -53,13 +117,13 @@ void draw(){
     if (mouseButton == LEFT) setTile(true);
     if (mouseButton == RIGHT) setTile(false);
   }
-  drawModules();
+  if (pixelView) drawPixels();
+  else drawModules();
+
   if (record) {
       endRecord();
       record = false;
   }
-//    shape(modules.get(0), 110, 90, 100, 100);  // Draw at coordinate (110, 90) at size 100 x 100
-//    shape(modules.get(10), 280, 40);            // Draw at coordinate (280, 40) at the default size
 }
 
 void setTile(boolean on) {
@@ -94,6 +158,35 @@ void drawModules() {
             }
         }
     }
+}
+
+void drawPixels() {
+    fill(0);
+    for (int xTile=0; xTile<xNumTiles; xTile++) {
+        for (int yTile=0; yTile<yNumTiles; yTile++) {
+            if (tiles[xTile][yTile]) {
+                int posX = (int)round(tileSize*xTile);
+                int posY = (int)round(tileSize*yTile); 
+                rect(posX, posY, tileSize, tileSize);
+            }
+        }
+    } 
+}
+
+void exportTiles() {
+    PImage image = createImage(xNumTiles, yNumTiles, RGB);
+    color black = color(0);
+    color white = color(255);
+    for (int xTile=0; xTile<xNumTiles; xTile++) {
+        for (int yTile=0; yTile<yNumTiles; yTile++) {
+            if (tiles[xTile][yTile]) {
+                image.pixels[yTile*xNumTiles+xTile] = black;
+            } else {
+                image.pixels[yTile*xNumTiles+xTile] = white;
+            }
+        }
+    } 
+    image.save("pixelMap.png");
 }
 
 int findAdjacentTiles(int xTile,int yTile) {
@@ -131,20 +224,32 @@ int findAdjacentTiles(int xTile,int yTile) {
 }
 
 void keyPressed() {
-    if (key == 'r') {
-        reflectTiles();
-        drawModules();
-    }
-    if (key == 'm' || key == 'M') {
-        if (mirrored) mirrored = false;
-        else mirrored = true;
-
-        drawModules();
-    }
-    if (key == 'c') {
-        tiles = new boolean[xNumTiles][yNumTiles];
-    }
-    if (key == 's') {
-        record = true;
+    switch (str(key).toLowerCase()) {
+        case "r":
+            reflectTiles();
+            drawModules();
+            break;
+        case "c":
+            tiles = new boolean[xNumTiles][yNumTiles];
+        break;
+        case "m":
+            mirrored = !mirrored;
+            drawModules();
+            break;
+        case "l":
+            setTemplateImage();
+            break;
+        case "s":
+            if (pixelView) {
+                exportTiles();
+            } else {
+                record = true;
+            }
+            break;
+        case "p":
+            pixelView = !pixelView;
+            break;
+        default:
+        break;
     }
 }

@@ -1,0 +1,4 @@
+tileSize=20
+xNumTiles=10
+yNumTiles=10
+templateName=spaceInvader.png
