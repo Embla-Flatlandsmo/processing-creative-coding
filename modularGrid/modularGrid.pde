@@ -18,11 +18,19 @@ PImage templateImage;
 ArrayList<PShape> modules;
 
 boolean tiles[][];
-boolean prev_tiles[][];
+boolean prevTiles[][]; // for one-step ctrl-z
 
 // Workspace settings
 boolean mirrored = false;
 boolean pixelView = false;
+boolean isDragged = false;
+
+void undo() {
+    boolean tmpTiles[][] = copyArray(tiles);
+    tiles = copyArray(prevTiles);
+    prevTiles = copyArray(tmpTiles);
+    renderTiles();
+}
 
 void importImage() {
     templateImage = loadImage(templateName);
@@ -37,7 +45,6 @@ void importImage() {
     height = templateImage.height;
     xNumTiles = width;
     yNumTiles = height;
-    tiles = new boolean[width][height];
     templateExists = true;
 }
 
@@ -60,7 +67,6 @@ void settings() {
     /*Load settings */
     String[] settings = loadStrings("data/settings.txt");
 
-
     for(String s:settings){
         String[] setting=s.split("=");
         switch(setting[0].trim().toLowerCase()) {
@@ -82,6 +88,7 @@ void settings() {
         }
     }
     tiles = new boolean[xNumTiles][yNumTiles];
+    prevTiles = new boolean[xNumTiles][yNumTiles];
     setTemplateImage();
     int width = (int)round(tileSize*xNumTiles);
     int height = (int)round(tileSize*yNumTiles);
@@ -106,19 +113,26 @@ void setup() {
   }
 } 
 
-void draw(){
+void renderTiles() {
+    background(255);
+    if (pixelView) drawPixels();
+    else drawModules();
+}
 
+void draw(){
   if (record) {
     // Note that #### will be replaced with the frame number. Fancy!
     beginRecord(SVG, "frame-####.svg");
   }
-  background(255);
   if (mousePressed) {
+    if (!isDragged) prevTiles = copyArray(tiles);
     if (mouseButton == LEFT) setTile(true);
     if (mouseButton == RIGHT) setTile(false);
+    isDragged = true;
+  } else {
+    isDragged = false;
   }
-  if (pixelView) drawPixels();
-  else drawModules();
+  renderTiles();
 
   if (record) {
       endRecord();
@@ -188,7 +202,6 @@ void exportTiles() {
     } 
     image.save("pixelMap.png");
 }
-
 int findAdjacentTiles(int xTile,int yTile) {
     int north = 8;
     int west = 4;
@@ -224,19 +237,27 @@ int findAdjacentTiles(int xTile,int yTile) {
 }
 
 void keyPressed() {
+    if (key == 26) {
+        //ctrl-Z
+        println("ctrl-Z");
+        undo();
+    }
     switch (str(key).toLowerCase()) {
         case "r":
+            prevTiles = copyArray(tiles);
             reflectTiles();
-            drawModules();
+            renderTiles();
             break;
         case "c":
+            prevTiles = copyArray(tiles);
             tiles = new boolean[xNumTiles][yNumTiles];
         break;
         case "m":
             mirrored = !mirrored;
-            drawModules();
+            renderTiles();
             break;
         case "l":
+            prevTiles = copyArray(tiles);
             setTemplateImage();
             break;
         case "s":
@@ -252,4 +273,12 @@ void keyPressed() {
         default:
         break;
     }
+}
+
+boolean[][] copyArray(boolean[][] matrix) {
+    boolean[][] newArray = new boolean[matrix.length][];
+    for (int i = 0; i < matrix.length; i++) {
+        newArray[i] = matrix[i].clone();
+    }
+    return newArray;
 }

@@ -13,7 +13,7 @@ templateName=spaceInvader.png
 ### **Some notes:**
 * `tileSize`, `xNumTiles` and `yNumTiles` are integers. Trying to put float values might cause the software to crash.
 * If a template of the name given by `templateName` exists in the data folder, `xNumTiles` and `yNumTiles` will be set by the width and height of the picture.
-* If you want to make your own tiles, simply replace the SVG files in data. It is important that the tiles 
+* If you want to make your own tiles, simply replace the SVG files in data. It is important that the tiles.
 ## Controls
 | Key | Description |
 --- | --- |
@@ -22,6 +22,7 @@ templateName=spaceInvader.png
 **c** | clear canvas
 **r** | reflect the currently drawn tiles (only draws new tiles, does not erase any)
 **m** | start mirroring drawing
-**l** | load template image,
+**l** | load template image
+**Ctrl-z** | Undo. Max 1 step. Undoing twice will redo.
 
 <img src="./frame-1245.svg" width=500>
