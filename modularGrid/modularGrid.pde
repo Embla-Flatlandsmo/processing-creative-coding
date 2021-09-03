@@ -2,6 +2,7 @@
  * Based on Gestaltung P.2.3.6
  */
 import processing.svg.*;
+import java.util.Map;
 
 boolean record = false;
 
@@ -15,7 +16,8 @@ int height = (int)round(tileSize*yNumTiles);
 boolean templateExists = false;
 String templateName;
 PImage templateImage;
-ArrayList<PShape> modules;
+// ArrayList<Tile> modules;
+HashMap<String, ArrayList<PShape>> modules;
 
 boolean tiles[][];
 boolean prevTiles[][]; // for one-step ctrl-z
@@ -24,6 +26,49 @@ boolean prevTiles[][]; // for one-step ctrl-z
 boolean mirrored = false;
 boolean pixelView = false;
 boolean isDragged = false;
+
+// class Tile {
+//     ArrayList<PShape> modules;
+//     int numModules;
+//     int rotation;
+
+//     Tile(int rotation) {
+//         modules = new ArrayList<PShape>();
+//         rotation = rotation;
+//         numModules = 0;
+//     }
+
+//     int getRotation() {
+//         return rotation;
+//     }
+
+//     PShape getModule(int index) {
+//         return modules.get(index % numModules);
+//     }
+// }
+
+ArrayList<PShape> loadModules(String tileName) {
+    ArrayList<PShape> tiles = new ArrayList<PShape>();
+    int i = 0;
+    while (true) {
+        try {
+            String num;
+            if (i<10) {
+                num = "0"+str(i);
+            } else {
+                num = str(i);
+            }
+            String shapeName = tileName+"_"+num+".svg";
+            PShape shape = loadShape(shapeName);
+            tiles.add(shape);
+            i++;
+            println("Added shape: "+shapeName);
+        } catch (NullPointerException e) {
+            break;
+        }
+    }
+    return tiles;
+}
 
 void undo() {
     boolean tmpTiles[][] = copyArray(tiles);
@@ -96,22 +141,23 @@ void settings() {
 }
 
 void setup() {
-  modules = new ArrayList<PShape>();
-  // The files must be in the data folder
-  // of the current sketch to load successfully
-  for (int i=0; i < 16; i++) {
-      String shapeName;
-      String num;
-      if (i < 10) {
-          num = "0"+str(i);
-      } else {
-          num = str(i);
-      }
-      shapeName = num+".svg";
-      PShape shape = loadShape(shapeName);
-      modules.add(shape);
-  }
-} 
+    modules = new HashMap<String, ArrayList<PShape>>();
+    // The files must be in the data folder
+    // of the current sketch to load successfully
+    ArrayList<PShape> islands = loadModules("island");
+    modules.put("island", islands);
+    ArrayList<PShape> intersections = loadModules("intersection");
+    modules.put("intersection", intersections);
+    ArrayList<PShape> ends = loadModules("end");
+    modules.put("end", ends);
+    ArrayList<PShape> corners = loadModules("corner");
+    modules.put("corner", corners);
+    ArrayList<PShape> bridges = loadModules("bridge");
+    modules.put("bridge", bridges);
+    ArrayList<PShape> t = loadModules("T");
+    modules.put("T", t);
+
+}
 
 void renderTiles() {
     background(255);
@@ -120,23 +166,22 @@ void renderTiles() {
 }
 
 void draw(){
-  if (record) {
-    // Note that #### will be replaced with the frame number. Fancy!
-    beginRecord(SVG, "frame-####.svg");
-  }
   if (mousePressed) {
     if (!isDragged) prevTiles = copyArray(tiles);
     if (mouseButton == LEFT) setTile(true);
     if (mouseButton == RIGHT) setTile(false);
     isDragged = true;
+    renderTiles();
   } else {
     isDragged = false;
   }
-  renderTiles();
 
-  if (record) {
-      endRecord();
-      record = false;
+    if (record) {
+    // Note that #### will be replaced with the frame number. Fancy!
+    beginRecord(SVG, "frame-####.svg");
+    renderTiles();
+    endRecord();
+    record = false;
   }
 }
 
@@ -161,16 +206,63 @@ void reflectTiles() {
 }
 
 void drawModules() {
+    shapeMode(CENTER);
     for (int xTile=0; xTile<xNumTiles; xTile++) {
         for (int yTile=0; yTile<yNumTiles; yTile++) {
             if (tiles[xTile][yTile]) {
                 int adjacentIndex = findAdjacentTiles(xTile, yTile);
-                int posX = (int)round(tileSize*xTile);
-                int posY = (int)round(tileSize*yTile);  
-
-                shape(modules.get(adjacentIndex), posX, posY, tileSize, tileSize);
+                int posX = (int)round((tileSize+0.5)*xTile);
+                int posY = (int)round((tileSize+0.5)*yTile);  
+                String moduleName = getKeyFromIndex(adjacentIndex);
+                float rotation = getRotationFromIndex(adjacentIndex);
+                ArrayList<PShape> possibleModules = modules.get(moduleName);
+                PShape module = possibleModules.get(0);
+                pushMatrix();
+                translate(posX, posY);
+                rotate(rotation);
+                shape(module, 0, 0, tileSize, tileSize);
+                popMatrix();
             }
         }
+    }
+}
+
+String getKeyFromIndex(int index) {
+    switch (index) {
+    case 0: return "island";
+    case 1: return "end";
+    case 2: return "end";
+    case 3: return "corner";
+    case 4: return "end";
+    case 5: return "bridge";
+    case 6: return "corner";
+    case 7: return "T";
+    case 8: return "end";
+    case 9: return "corner";
+    case 10: return "bridge";
+    case 11: return "T";
+    case 12: return "corner";
+    case 13: return "T";
+    case 14: return "T";
+    case 15: return "intersection";
+    default: return "";
+    }
+
+}
+
+float getRotationFromIndex(int index) {
+    switch (index) {
+        case 2: return PI/2;
+        case 4: return PI;
+        case 6: return PI/2;
+        case 8: return 3*PI/2;
+        case 9: return -PI/2;
+        case 10: return PI/2;
+        case 11: return -PI/2;
+        case 12: return PI;
+        case 13: return PI;
+        case 14: return PI/2;
+        default: return 0.0;
     }
 }
 
@@ -246,7 +338,6 @@ void keyPressed() {
         case "r":
             prevTiles = copyArray(tiles);
             reflectTiles();
-            renderTiles();
             break;
         case "c":
             prevTiles = copyArray(tiles);
@@ -254,7 +345,6 @@ void keyPressed() {
         break;
         case "m":
             mirrored = !mirrored;
-            renderTiles();
             break;
         case "l":
             prevTiles = copyArray(tiles);
@@ -273,6 +363,7 @@ void keyPressed() {
         default:
         break;
     }
+    renderTiles();
 }
 
 boolean[][] copyArray(boolean[][] matrix) {

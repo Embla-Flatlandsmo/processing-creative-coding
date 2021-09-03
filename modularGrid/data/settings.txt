@@ -1,4 +1,42 @@
 tileSize=20
-xNumTiles=10
-yNumTiles=10
-templateName=spaceInvader.png
+xNumTiles=30
+yNumTiles=30
+templateName=spaceInvdader.png
+
+int rotateByIndex(int index) {
+    switch (index) {
+        case 2:
+            rotate(PI/2);
+            return 1;
+        break;
+        case 4:
+            rotate(PI);
+        break;
+        case 6:
+            rotate(PI/2);
+        break;
+        case 8:
+            rotate(3*PI/2);
+        break;
+        case 9:
+            rotate(-PI/2);
+        break;
+        case 10:
+            rotate(PI/2);
+            break;
+        case 11:
+            rotate(-PI/2);
+        break;
+        case 12:
+            rotate(PI);
+        break;
+        case 13:
+            rotate(PI);
+        break;
+        case 14:
+            rotate(PI/2);
+        break;
+        default:
+        break;
+    }
+}
