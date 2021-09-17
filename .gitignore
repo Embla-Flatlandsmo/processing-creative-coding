@@ -6,3 +6,4 @@ modularGrid/application.windows64
 **/build/out
 **/out
 **/build/build-tmp
+**/frames/*.png
