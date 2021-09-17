@@ -1,23 +1,9 @@
-/**
- * Based on Gestaltung P.2.3.6
- */
 import processing.svg.*;
 
-// ArrayList<PShape> modules;
 int numFrames = 300;
 int counter = 0;
 float percent = 0;
 void setup() {
-  // modules = new ArrayList<PShape>();
-  // // The files must be in the data folder
-  // // of the current sketch to load successfully
-  // PShape shape = loadShape("14.svg");
-  // modules.add(shape);
-  // try {
-  //   PShape shape2 = loadShape("15.svg");
-  // } catch (NullPointerException e) {
-  //   println("Could not load shape!");
-  // }
   stroke(0);
   strokeWeight(12);
   rectMode(CENTER);
@@ -41,6 +27,7 @@ void drawRect(float size, float rot, color col) {
     return;
   }
   color new_color = color(hue(col), max(saturation(col)-7,0), min(brightness(col)+7,100));
+
   pushMatrix();
   translate(width/2, height/2);
   rotate(radians(rot));
@@ -48,11 +35,11 @@ void drawRect(float size, float rot, color col) {
   rect(0,0, size, size);
   popMatrix();
 
+  // Recursion!
   drawRect(size-20, rot+rotStep, new_color);
 }
 
 void draw() {
-  // rotStep = mouseX;
   background(255, 0, 0);
   percent = frameCount*100/numFrames;
   if (percent >= 100) {
