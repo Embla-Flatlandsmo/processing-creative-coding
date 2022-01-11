@@ -1,109 +1,284 @@
+/**
+ * Based on Gestaltung P.2.3.6
+ */
 import processing.svg.*;
 
-int numFrames = 300;
-int counter = 0;
-float percent = 0;
+boolean record = false;
 
-// class Unit {
-//   PVector location, velocity, acceleration;
+int tileSize = 20;
+int xNumTiles = 30;
+int yNumTiles = 30;
 
-//   ArrayList<PVector> locations, velocities;
+int width = (int)round(tileSize*xNumTiles);
+int height = (int)round(tileSize*yNumTiles);
 
-//   int length;
+boolean templateExists = false;
+String templateName;
+PImage templateImage;
+ArrayList<PShape> modules;
 
-//   Unit(PVector origin, int length_) {
-//     //Initialize variables
-//     length = length_;
+boolean tiles[][];
+boolean prevTiles[][]; // for one-step ctrl-z
 
-//     location = origin.get();
-//     velocity = new PVector(0,0);
-//     acceleration = new PVector(1,1);
+// Workspace settings
+boolean mirrored = false;
+boolean pixelView = false;
+boolean isDragged = false;
 
-//     locations = new ArrayList<PVector>();
-//     velocities = new ArrayList<PVector>();
+void undo() {
+    boolean tmpTiles[][] = copyArray(tiles);
+    tiles = copyArray(prevTiles);
+    prevTiles = copyArray(tmpTiles);
+    renderTiles();
+}
 
-//     locations.add(location.get());
-//     velocities.add(velocity.get());
-// }
+void importImage() {
+    templateImage = loadImage(templateName);
+    if (templateImage == null) return ;
+    templateImage.loadPixels();
+    if (templateImage.width == -1 || templateImage.height == -1) return;
+
+    color threshold = #808080;
+    templateImage.filter(THRESHOLD);
+    
+    width = templateImage.width;
+    height = templateImage.height;
+    xNumTiles = width;
+    yNumTiles = height;
+    templateExists = true;
+}
+
+void setTemplateImage() {
+    if (!templateExists) return;
+    color black = color(0,0,0);
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (templateImage.pixels[y*width+x] == #000000) {
+                tiles[x][y] = true;
+            } else {
+                tiles[x][y] = false;
+            }
+        }
+    }
+}
+
+void settings() {
+    /*Load settings */
+    String[] settings = loadStrings("data/settings.txt");
+
+    for(String s:settings){
+        String[] setting=s.split("=");
+        switch(setting[0].trim().toLowerCase()) {
+            case "tilesize":
+                tileSize = Integer.valueOf(setting[1]);
+                break;
+            case "xnumtiles":
+                xNumTiles = Integer.valueOf(setting[1]);
+                break;
+            case "ynumtiles":
+                yNumTiles = Integer.valueOf(setting[1]);
+                break;
+            case "templatename":
+                templateName = setting[1];
+                importImage();
+            default:
+                println("No settings found");
+                break;
+        }
+    }
+    tiles = new boolean[xNumTiles][yNumTiles];
+    prevTiles = new boolean[xNumTiles][yNumTiles];
+    setTemplateImage();
+    int width = (int)round(tileSize*xNumTiles);
+    int height = (int)round(tileSize*yNumTiles);
+    size(width, height);
+}
 
 void setup() {
-  strokeWeight(2);
-  stroke(255);
-  colorMode(HSB, 360, 100, 100);
-  size(450,450);
-  smooth(4);
+  modules = new ArrayList<PShape>();
+  // The files must be in the data folder
+  // of the current sketch to load successfully
+  for (int i=0; i < 16; i++) {
+      String shapeName;
+      String num;
+      if (i < 10) {
+          num = "0"+str(i);
+      } else {
+          num = str(i);
+      }
+      shapeName = num+".svg";
+      PShape shape = loadShape(shapeName);
+      modules.add(shape);
+  }
+} 
+
+void renderTiles() {
+    background(255);
+    if (pixelView) drawPixels();
+    else drawModules();
 }
 
-int num_x = 90;
-int num_y = 90;
-float noiseMapScale = 0.08;
+void draw(){
+  if (record) {
+    // Note that #### will be replaced with the frame number. Fancy!
+    beginRecord(SVG, "frame-####.svg");
+  }
+  if (mousePressed) {
+    if (!isDragged) prevTiles = copyArray(tiles);
+    if (mouseButton == LEFT) setTile(true);
+    if (mouseButton == RIGHT) setTile(false);
+    isDragged = true;
+  } else {
+    isDragged = false;
+  }
+  renderTiles();
 
-void render(float percent) {
-  // for (int x=0; x < width; x++) {
-  //   float noiseVal = noise((mouseX+x)*noiseMapScale, mouseY*noiseMapScale);
-  //   stroke(noiseVal*255);
-  //   line(x, mouseY+noiseVal*80, x, height);
-  // }
-  for (int y = 0; y < num_y; y++) {
-    for (int x = 0; x < num_x; x++) {
-      float noise_val = noise(noiseMapScale*float(x)+noiseMapScale*(sin(radians(3.6*percent+10*x))), 
-                              noiseMapScale*float(y)+noiseMapScale*(cos(radians(3.6*percent+10*y))));
-      float angle = TWO_PI*noise_val;
-      float pos_x = map(float(x), 0, num_x-1, 0, width);
-      float pos_y = map(float(y), 0, num_y-1, 0, height);
-      float hue = map(noise_val, 0, 1, 0, 80);
-      color c = color(hue, 80, 80);
-      stroke(c);
-      pushMatrix();
-      translate(pos_x, pos_y);
-      rotate(angle);
-      line(-30, 0, 30, 0);
-      popMatrix();
+  if (record) {
+      endRecord();
+      record = false;
+  }
+}
+
+void setTile(boolean on) {
+    int xTile = floor(mouseX / tileSize);
+    xTile = constrain(xTile, 0, xNumTiles-1);
+    int yTile = floor(mouseY / tileSize);
+    yTile = constrain(yTile, 0, yNumTiles-1);
+    tiles[xTile][yTile]=on;
+    if (mirrored) tiles[xNumTiles-xTile-1][yTile] = on;
+}
+
+void reflectTiles() {
+    for (int xTile = 0; xTile < xNumTiles-1; xTile++) {
+        for (int yTile = 0; yTile<yNumTiles-1; yTile++) {
+            if ((tiles[xTile][yTile]) || (tiles[xNumTiles-xTile-1][yTile])) {
+                tiles[xNumTiles-xTile-1][yTile] = true;
+                tiles[xTile][yTile] = true;
+            }
+        }
     }
-  }
-
-  if (percent>0) {
-    saveFrame("frames/frame_###.png");
-  }
-  // curve(20, 104, 20, 104, 292, 96, 292, 244);
-
-  // line(120, 80, 340, 300);
-  // stroke(0); 
-  // float t = map(mouseX, 0, width, -5, 5);
-  // curveTightness(t);
-  // beginShape();
-  // curveVertex(10, 26);
-  // curveVertex(10, 26);
-  // curveVertex(83, 24);
-  // curveVertex(83, 61);
-  // curveVertex(25, 65); 
-  // curveVertex(25, 65);
-  // endShape();
-
-  // pushMatrix();
-  // translate(width/2, height/2);
-  // rotate(radians(percent*3.6));
-  // color start_color = color(0, 100, 100);
-  // color end_color = color(0, 0, 0);
-  // color frame_col = lerpColor(start_color, end_color, 0.5*(1+sin(radians(percent*3.6))));
-  // fill(frame_col);
-  // float amplitude = cos(radians(percent*3.6))*100;
-  // for (int i = 0; i < num_dots; i++) {
-  //   float x_offset = cos(radians(i*360/num_dots))*amplitude;
-  //   float y_offset = sin(radians(i*360/num_dots))*amplitude;
-  //   ellipse(x_offset, y_offset, 5*(2+cos(radians(percent*3.6))), 5*(2+cos(radians(percent*3.6))));
-  // }
-  // popMatrix();
-
 }
 
-void draw() {
-  background(20, 80, 80, 255);
-  stroke(0, 0, 100, 255);
-  percent = frameCount*100/numFrames;
-  if (percent >= 100) {
-    exit();
-  } 
-  counter++;
-  render(percent);
+void drawModules() {
+    for (int xTile=0; xTile<xNumTiles; xTile++) {
+        for (int yTile=0; yTile<yNumTiles; yTile++) {
+            if (tiles[xTile][yTile]) {
+                int adjacentIndex = findAdjacentTiles(xTile, yTile);
+                int posX = (int)round(tileSize*xTile);
+                int posY = (int)round(tileSize*yTile);  
+
+                shape(modules.get(adjacentIndex), posX, posY, tileSize, tileSize);
+            }
+        }
+    }
+}
+
+void drawPixels() {
+    fill(0);
+    for (int xTile=0; xTile<xNumTiles; xTile++) {
+        for (int yTile=0; yTile<yNumTiles; yTile++) {
+            if (tiles[xTile][yTile]) {
+                int posX = (int)round(tileSize*xTile);
+                int posY = (int)round(tileSize*yTile); 
+                rect(posX, posY, tileSize, tileSize);
+            }
+        }
+    } 
+}
+
+void exportTiles() {
+    PImage image = createImage(xNumTiles, yNumTiles, RGB);
+    color black = color(0);
+    color white = color(255);
+    for (int xTile=0; xTile<xNumTiles; xTile++) {
+        for (int yTile=0; yTile<yNumTiles; yTile++) {
+            if (tiles[xTile][yTile]) {
+                image.pixels[yTile*xNumTiles+xTile] = black;
+            } else {
+                image.pixels[yTile*xNumTiles+xTile] = white;
+            }
+        }
+    } 
+    image.save("pixelMap.png");
+}
+int findAdjacentTiles(int xTile,int yTile) {
+    int north = 8;
+    int west = 4;
+    int south = 2;
+    int east = 1;
+
+    int adjacencyIndex = 0;
+    if (yTile > 0) {
+        if (tiles[xTile][yTile-1]) {
+            adjacencyIndex += north;
+        }
+    }
+
+    if (yTile<yNumTiles-1) {
+        if (tiles[xTile][yTile+1]) {
+            adjacencyIndex += south;
+        }
+    } 
+
+    if (xTile > 0) {
+        if (tiles[xTile-1][yTile]) {
+            adjacencyIndex += west;
+        }
+    }
+
+    if (xTile < xNumTiles-1) {
+        if (tiles[xTile+1][yTile]) {
+            adjacencyIndex += east;
+        }
+    }
+
+    return adjacencyIndex;
+}
+
+void keyPressed() {
+    if (key == 26) {
+        //ctrl-Z
+        println("ctrl-Z");
+        undo();
+    }
+    switch (str(key).toLowerCase()) {
+        case "r":
+            prevTiles = copyArray(tiles);
+            reflectTiles();
+            renderTiles();
+            break;
+        case "c":
+            prevTiles = copyArray(tiles);
+            tiles = new boolean[xNumTiles][yNumTiles];
+        break;
+        case "m":
+            mirrored = !mirrored;
+            renderTiles();
+            break;
+        case "l":
+            prevTiles = copyArray(tiles);
+            setTemplateImage();
+            break;
+        case "s":
+            if (pixelView) {
+                exportTiles();
+            } else {
+                record = true;
+            }
+            break;
+        case "p":
+            pixelView = !pixelView;
+            break;
+        default:
+        break;
+    }
+}
+
+boolean[][] copyArray(boolean[][] matrix) {
+    boolean[][] newArray = new boolean[matrix.length][];
+    for (int i = 0; i < matrix.length; i++) {
+        newArray[i] = matrix[i].clone();
+    }
+    return newArray;
 }
