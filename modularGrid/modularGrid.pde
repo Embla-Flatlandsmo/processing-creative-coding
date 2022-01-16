@@ -75,6 +75,9 @@ void keyPressed() {
         case "p":
             modularGrid.toggleDebugMode();
             break;
+        case "v":
+            modularGrid.refreshValueMap();
+            break;
         default:
         break;
     }

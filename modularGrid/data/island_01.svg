@@ -2,9 +2,10 @@
 <!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
-<g id="intersection_x5F_00">
-	<polygon points="70,0 30,0 100,70 100,30 	"/>
-	<polygon points="0,70 30,100 70,100 0,30 	"/>
+<g id="island_x5F_01">
+	<g>
+		<rect x="22.423" y="22.423" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -20.7107 50)" width="55.154" height="55.154"/>
+	</g>
 </g>
 <g id="Layer_1">
 </g>

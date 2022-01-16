@@ -30,6 +30,14 @@ class TileGrid extends InfoGrid {
         debugMode = !debugMode;
     }
 
+    void refreshValueMap() {
+        for (int x = 0; x < super.xNumTiles; x++) {
+            for (int y = 0; y < super.yNumTiles; y++) {
+                valueMap[x][y] = (int)random(maxRandomValue);
+            }
+        }
+    }
+
     void display() {
         if (debugMode) {
             super.display();

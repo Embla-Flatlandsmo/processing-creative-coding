@@ -2,9 +2,8 @@
 <!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
-<g id="intersection_x5F_00">
-	<polygon points="70,0 30,0 100,70 100,30 	"/>
-	<polygon points="0,70 30,100 70,100 0,30 	"/>
+<g id="bridge_x5F_01">
+	<path d="M69,30L50,11L31,30H0v40h31l19,19l19-19h31V30H69z M50,65L35,50l15-15l15,15L50,65z"/>
 </g>
 <g id="Layer_1">
 </g>
