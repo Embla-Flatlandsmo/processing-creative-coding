@@ -11,20 +11,3 @@ PImage[] importPNGSequence(String filename, int sequenceLength) {
     }
     return images;
 }
-
-PImage importTemplateImage(String templateName) {
-    PImage templateImage = loadImage(templateName);
-    if (templateImage == null) return templateImage;
-    templateImage.loadPixels();
-    if (templateImage.width == -1 || templateImage.height == -1) return templateImage;
-
-    color threshold = #808080;
-    templateImage.filter(THRESHOLD);
-    
-    // width = templateImage.width;
-    // height = templateImage.height;
-    // xNumTiles = width;
-    // yNumTiles = height;
-    // templateExists = true;
-    return templateImage;
-}

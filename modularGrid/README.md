@@ -26,3 +26,6 @@ templateName=spaceInvader.png
 **Ctrl-z** | Undo. Max 1 step. Undoing twice will redo.
 
 <img src="./frame-1245.svg" width=500>
+
+## Implementation details
+`infoGrid.pde` keeps track of information about the grid. Most importantly, it keeps track of where its neighbors are, and also whether or not the current tile is active.
