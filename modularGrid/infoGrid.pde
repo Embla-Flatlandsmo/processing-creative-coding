@@ -35,7 +35,6 @@ class InfoGrid {
     int xNumTiles;
     float tileSize;
 
-    boolean templateExists;
     boolean mirrorMode;
 
     InfoGrid(float tileSize, int xNumTiles, int yNumTiles) {
@@ -44,23 +43,7 @@ class InfoGrid {
         this.tileSize = tileSize;
         tiles = new int[xNumTiles][yNumTiles];
         prevTiles = new int[xNumTiles][yNumTiles];
-        templateExists = false;
         mirrorMode = false;
-    }
-
-    void setTemplateImage() {
-        if (!templateExists) return;
-        color black = color(0,0,0);
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (templateImage.pixels[y*width+x] == #000000) {
-                    tiles[x][y] |= ACTIVE_TILE_MASK;
-                } else {
-                    tiles[x][y] &= ~ACTIVE_TILE_MASK;
-                }
-            }
-        }
     }
 
     boolean isActive(int x, int y) {

@@ -9,7 +9,7 @@ tubular-1             | growing-circles-1 | feathers-1
 
 van-goghify                | spinning-square-1 | modular-grid (interactive)
 :-------------------------:|:-------------------------:|:-------------------------:
-<img src="./van-goghify/Van_Gogh_Lines.PNG" width=300> | <img src="./spinning-square-1/frames/out.gif" width=300> | <img src="./modularGrid/frame-1245.svg" width=300>
+<img src="./van-goghify/Van_Gogh_Lines.PNG" width=300> | <img src="./spinning-square-1/frames/out.gif" width=300> | <img src="./modularGrid/sample.svg" width=300>
 
 hairy-brush (interactive)                | jellyfish | physics-water-surface (interactive)
 :-------------------------:|:-------------------------:|:-------------------------:

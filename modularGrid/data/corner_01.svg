@@ -2,12 +2,17 @@
 <!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
-<g id="bridge_x5F_00">
+<g id="corner_x5F_01">
 	<g>
-		<rect y="30" width="100" height="40"/>
+		<rect x="30.5" y="68.5" width="39" height="31"/>
+		<path d="M69,69v30H31V69H69 M70,68H30v32h40V68L70,68z"/>
 	</g>
 	<g>
-		<rect x="22.423" y="22.423" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -20.7107 50)" width="55.154" height="55.154"/>
+		<rect x="63.5" y="30.5" width="36" height="39"/>
+		<path d="M99,31v38H64V31H99 M100,30H63v40h37V30L100,30z"/>
+	</g>
+	<g>
+		<path d="M50,39.284L60.716,50L50,60.716L39.284,50L50,39.284 M50,11L11,50l39,39l39-39L50,11L50,11z"/>
 	</g>
 </g>
 <g id="Layer_1">

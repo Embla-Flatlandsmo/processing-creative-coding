@@ -1,6 +1,6 @@
 # modular-grid
 A grid that renders svg tiles based on its neighbors. Drag the mouse to draw some tiles and see how the rendered tiles change!
-My implementation of [Generative Design](http://www.generative-gestaltung.de/2/) P.2.3.6 with some tweaks of my own. Tiles made by [Mats N. Olsen](https://www.instagram.com/claystation2/).
+My implementation of [Generative Design](http://www.generative-gestaltung.de/2/) P.2.3.6 with some tweaks of my own.
 
 ## Settings
 I have provided a few settings. The size of the window is determined `tileSize`, `xNumTiles` and `yNumTiles`. The setting names are not case sensitive but needs to be delimited by `=`. This is the default configuration:
@@ -32,9 +32,10 @@ Bridge                     |        Corner             | End
 **r** | reflect the currently drawn tiles (only draws new tiles, does not erase any)
 **m** | start mirroring drawing
 **l** | load template image
+**v** | pick new random tiles
 **Ctrl-z** | Undo. Max 1 step. Undoing twice will redo.
 
-<img src="./frame-1245.svg" width=500>
+<img src="./sample.svg" width=500>
 
 ## Implementation details
 `infoGrid.pde` keeps track of information about the grid. Most importantly, it keeps track of where its neighbors are, and also whether or not the current tile is active.

@@ -30,6 +30,14 @@ class TileGrid extends InfoGrid {
         debugMode = !debugMode;
     }
 
+    void refreshValueMap() {
+        for (int x = 0; x < super.xNumTiles; x++) {
+            for (int y = 0; y < super.yNumTiles; y++) {
+                valueMap[x][y] = (int)random(maxRandomValue);
+            }
+        }
+    }
+
     void display() {
         if (debugMode) {
             super.display();
@@ -39,8 +47,8 @@ class TileGrid extends InfoGrid {
         for (int xTile = 0; xTile < super.xNumTiles; xTile++) {
             for (int yTile = 0; yTile < super.yNumTiles; yTile++) {
                 if (super.isActive(xTile,yTile)) {
-                    int posX = (int)(tileSize+0.5)*xTile;
-                    int posY = (int)(tileSize+0.5)*yTile;
+                    int posX = (int)(tileSize*(xTile+0.5));
+                    int posY = (int)(tileSize*(yTile+0.5));
                      
                     int adjacencyIndex = super.getAdjacencyIndex(xTile, yTile); 
                     String moduleName = this.getKeyFromIndex(adjacencyIndex);

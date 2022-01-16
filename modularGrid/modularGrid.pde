@@ -3,18 +3,6 @@
  */
 import processing.svg.*;
 
-int tileSize = 20;
-int xNumTiles = 30;
-int yNumTiles = 30;
-
-int width = (int)round(tileSize*xNumTiles);
-int height = (int)round(tileSize*yNumTiles);
-
-boolean templateExists = false;
-String templateName;
-PImage templateImage;
-ArrayList<PShape> modules;
-
 TileGrid modularGrid;
 SettingsLoader settings;
 
@@ -74,6 +62,9 @@ void keyPressed() {
             break;
         case "p":
             modularGrid.toggleDebugMode();
+            break;
+        case "v":
+            modularGrid.refreshValueMap();
             break;
         default:
         break;
