@@ -14,6 +14,15 @@ templateName=spaceInvader.png
 * `tileSize`, `xNumTiles` and `yNumTiles` are integers. Trying to put float values might cause the software to crash.
 * If a template of the name given by `templateName` exists in the data folder, `xNumTiles` and `yNumTiles` will be set by the width and height of the picture.
 * If you want to make your own tiles, simply replace the SVG files in data. It is important that the tiles.
+
+## Making your own tiles
+The `data` folder contains the svg-files used in the project. They must be named with two letter suffixed, i.e. `bridge_00.svg`, `bridge_01.svg` etc. They must be named sequentially, as the program keeps trying to load tiles incrementally until it cannot find a file. They need to be provided in the following rotations, otherwise it will end up looking wrong:
+
+Bridge                     |        Corner             | End
+:-------------------------:|:-------------------------:|:-------------------------:
+<img src="./data/bridge_00.svg" width=50> | <img src="./data/corner_00.svg" width=50> | <img src="./data/end_00.svg" width=50>
+**Intersection**           |        **Island**             | **T**
+<img src="./data/intersection_00.svg" width=50> | <img src="./data/island_00.svg" width=50> | <img src="./data/T_00.svg" width=50>
 ## Controls
 | Key | Description |
 --- | --- |

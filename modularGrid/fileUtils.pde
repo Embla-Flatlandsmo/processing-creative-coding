@@ -11,3 +11,21 @@ PImage[] importPNGSequence(String filename, int sequenceLength) {
     }
     return images;
 }
+
+ArrayList<PShape> loadModules(String tileName) {
+    ArrayList<PShape> tiles = new ArrayList<PShape>();
+    int i = 0;
+    while (true) {
+        try {
+            String shapeName = tileName + "_" + nf(i, 2) + ".svg";
+            PShape shape = loadShape(shapeName);
+            tiles.add(shape);
+            i++;
+            println("Added shape: " + shapeName);
+        }
+        catch (NullPointerException e) {
+            break;
+        }
+    }
+    return tiles;
+}
