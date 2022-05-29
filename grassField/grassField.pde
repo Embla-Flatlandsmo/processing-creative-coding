@@ -38,6 +38,9 @@ void keyPressed() {
     field.createNewField();
     flowfield.restartFlowField();
   }
+  if (key == 's') {
+    saveFrame("grassField.png");
+  }
   if (keyCode == UP) {
     field.incrementRotationAmount(PI/20);
   }

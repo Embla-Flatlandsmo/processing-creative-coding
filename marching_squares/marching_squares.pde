@@ -26,4 +26,8 @@ void keyPressed() {
     } 
     squares.setThreshold(threshold);
   }
+  if (key == 's')
+  {
+    saveFrame("out.png");
+  }
 }
